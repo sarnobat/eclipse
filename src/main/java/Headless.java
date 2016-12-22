@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -27,7 +28,7 @@ public class Headless {
 		System.setProperty("webdriver.chrome.silentOutput", "true");
 
 		WebDriver driver = new FirefoxDriver();
-		Wait<WebDriver> wait = new WebDriverWait(driver, 30);
+		//Wait<WebDriver> wait = new WebDriverWait(driver, 30);
 
 		// HtmlUnitDriver and FirefoxDriver didn't work. Thankfully
 		// ChromeDriver does
