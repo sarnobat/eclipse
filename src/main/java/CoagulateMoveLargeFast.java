@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
@@ -12,6 +14,8 @@ import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.common.io.Files;
 
 /**
  * 2020-11-01 this is needed because Tomcat's webdav's move is slow for large
@@ -26,30 +30,49 @@ public class CoagulateMoveLargeFast {
 		@javax.ws.rs.Path("moveBase64")
 		@Produces("application/json")
 		public Response moveBase64(@QueryParam("filePath") String iFilePath1,
-				@QueryParam("destinationDirSimpleName") String iDestinationDirSimpleName)
-				throws JSONException, IOException {
+				@QueryParam("destinationDirPath") String iDestinationDirSimpleName) throws JSONException, IOException {
 
 			System.err.println("moveBase64() " + iFilePath1);
 
-			String iFilePath = "";
+			Path path = Paths.get(System.getProperty("user.home") + "/bin/coagulate_move_file_to_subfolder.sh");
+			if (!path.toFile().exists()) {
+				return Response.serverError().header("Access-Control-Allow-Origin", "*")
+						.entity(new JSONObject().toString(4)).type("application/json").build();
+			}
+
+			String srcFilePathDecoded = "";
 			try {
-				iFilePath = StringUtils.newStringUtf8(Base64.decodeBase64(iFilePath1));// Base64.getDecoder().decode(iFilePath1);
+				srcFilePathDecoded = StringUtils.newStringUtf8(Base64.decodeBase64(iFilePath1)).replaceAll(".*webdav",
+						"");// Base64.getDecoder().decode(iFilePath1);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("moveBase64() " + e.toString());
 				throw e;
 			}
-			System.err.println("moveBase64() " + iFilePath);
-			if (iFilePath.endsWith("htm") || iFilePath.endsWith(".html")) {
+			System.err.println("moveBase64() " + srcFilePathDecoded);
+			if (srcFilePathDecoded.endsWith("htm") || srcFilePathDecoded.endsWith(".html")) {
 				throw new RuntimeException("Need to move the _files folder too");
 			}
-			if (iDestinationDirSimpleName.equals("_ 1")) {
-				System.out.println("move() - dir name is wrong");
-				throw new RuntimeException("dir name is wrong: " + iDestinationDirSimpleName);
-			}
 
-			return Response.ok().header("Access-Control-Allow-Origin", "*").entity(new JSONObject().toString(4))
-					.type("application/json").build();
+			String destDirDecoded = StringUtils.newStringUtf8(Base64.decodeBase64(iDestinationDirSimpleName))
+					.replaceAll(".*webdav", "");
+			try {
+				Process start = new ProcessBuilder(path.toAbsolutePath().toString(), srcFilePathDecoded, destDirDecoded)
+						.inheritIO().start();
+				start.waitFor();
+				int exitCode = start.exitValue();
+				if (exitCode == 0) {
+					return Response.ok().header("Access-Control-Allow-Origin", "*").entity(new JSONObject().toString(4))
+							.type("application/json").build();
+				} else {
+					return Response.serverError().header("Access-Control-Allow-Origin", "*")
+							.entity(new JSONObject().toString(4)).type("application/json").build();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return Response.serverError().header("Access-Control-Allow-Origin", "*")
+						.entity(new JSONObject().toString(4)).type("application/json").build();
+			}
 		}
 	}
 
