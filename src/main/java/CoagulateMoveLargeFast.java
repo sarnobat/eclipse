@@ -32,7 +32,7 @@ public class CoagulateMoveLargeFast {
 		public Response moveBase64(@QueryParam("filePath") String iFilePath1,
 				@QueryParam("destinationDirPath") String iDestinationDirSimpleName) throws JSONException, IOException {
 
-			System.err.println("moveBase64() " + iFilePath1);
+//			System.err.println("moveBase64() " + iFilePath1);
 
 			Path path = Paths.get(System.getProperty("user.home") + "/bin/coagulate_move_file_to_subfolder.sh");
 			if (!path.toFile().exists()) {
@@ -49,7 +49,7 @@ public class CoagulateMoveLargeFast {
 				System.err.println("moveBase64() " + e.toString());
 				throw e;
 			}
-			System.err.println("moveBase64() " + srcFilePathDecoded);
+//			System.err.println("moveBase64() " + srcFilePathDecoded);
 			if (srcFilePathDecoded.endsWith("htm") || srcFilePathDecoded.endsWith(".html")) {
 				throw new RuntimeException("Need to move the _files folder too");
 			}
@@ -78,7 +78,7 @@ public class CoagulateMoveLargeFast {
 
 	public static void main(String[] args) {
 
-		String port = System.getProperty("port", "1157");
+		String port = System.getProperty("port", "4466");
 
 		try {
 			JdkHttpServerFactory.createHttpServer(new URI("http://localhost:" + port + "/"),
