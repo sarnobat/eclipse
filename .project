@@ -7,8 +7,18 @@
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
     </buildCommand>
+<<<<<<< HEAD
   </buildSpec>
   <natures>
     <nature>org.eclipse.jdt.core.javanature</nature>
+=======
+    <buildCommand>
+      <name>org.eclipse.m2e.core.maven2Builder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.eclipse.m2e.core.maven2Nature</nature>
+>>>>>>> f6ce7d6cc755e7dcb391c88e5d5719a105b6cef5
   </natures>
 </projectDescription>
